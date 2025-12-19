@@ -1,0 +1,5 @@
+method,actionability_score_mean,actionability_score_std,sparsity_mean,sparsity_std,proximity_l1_mean,proximity_l1_std,validity_mean,causal_validity_mean,generation_time_ms_mean,generation_time_ms_std,success_rate
+Causal,0.1666,0.1011,6.4444,1.1991,3.2884,1.0624,1.0,1.0,5148.2585,4799.0069,0.9
+Causal-Relaxed,0.1529,0.1076,6.25,1.4096,3.1209,0.958,0.95,0.85,7189.3725,5372.3825,1.0
+DiCE,0.5,0.0,1.55,0.5104,46866.2125,85606.6441,1.0,0.0,969.4193,3669.3229,1.0
+Optimization,0.5,0.0,22.7368,0.8719,1306.9335,2.607,1.0,0.0,79.2399,4.0932,0.95

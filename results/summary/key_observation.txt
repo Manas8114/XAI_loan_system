@@ -1,0 +1,7 @@
+
+Causal counterfactuals achieve the highest actionability score (0.167) 
+and maintain perfect causal validity (100%), demonstrating 
+that respecting causal dependencies produces more realistic and feasible recommendations.
+
+DiCE and Optimization baselines show lower causal validity rates, indicating they 
+may suggest changes that violate real-world constraints between features.

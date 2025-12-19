@@ -1,0 +1,7 @@
+{
+  "models": [
+    "xgboost_approval",
+    "random_forest_approval"
+  ],
+  "default_model_type": "xgboost"
+}

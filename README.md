@@ -1,70 +1,92 @@
-# XAI-Driven Causal Counterfactual Loan System
+# XAI_loan_system
 
-A research-grade AI system combining Explainable AI (XAI), counterfactual reasoning, and causal inference for loan risk assessment.
+Explainable AI for loan underwriting — transparent credit decisions with feature attributions, counterfactuals, and regulatory compliance.
+
+## Problem
+
+Traditional ML credit models are black boxes. Regulators (RBI, CFPB) and customers demand explanations:
+- Why was I denied?
+- What would change the outcome?
+- Is the model biased?
+
+## Solution
+
+XAI layer on top of any credit model (XGBoost, LightGBM, Neural Net):
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    XAI LOAN SYSTEM                           │
+├─────────────────────────────────────────────────────────────┤
+│  INPUT: Applicant features + Model prediction               │
+├─────────────────────────────────────────────────────────────┤
+│  EXPLANATION ENGINE                                          │
+│  ├── SHAP (global + local feature importance)               │
+│  ├── Counterfactuals (minimal changes for approval)         │
+│  ├── LIME (local interpretable explanations)                │
+│  ├── Feature Interaction (SHAP interaction values)          │
+│  └── Bias Audit (demographic parity, equalized odds)        │
+├─────────────────────────────────────────────────────────────┤
+│  OUTPUT: Human-readable report + API for frontend           │
+└─────────────────────────────────────────────────────────────┘
+```
 
 ## Features
 
-- **Loan Approval Prediction**: XGBoost-based classification
-- **Interest Rate Prediction**: Multi-class risk band prediction
-- **SHAP Explanations**: Global and local feature importance
-- **Counterfactual Explanations**:
-  - DiCE-based (baseline)
-  - Optimization-based (baseline)
-  - Causal counterfactuals (primary contribution)
-- **Ethics Guard Layer**: Constraint validation and fairness checks
-- **REST API**: FastAPI backend with `/predict`, `/explain`, `/counterfactual` endpoints
-
-## Installation
-
-```bash
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-```
+| Capability | Description |
+|------------|-------------|
+| **Global SHAP** | Feature importance across portfolio |
+| **Local SHAP** | Per-applicant waterfall plot |
+| **Counterfactuals** | "Increase income by ₹15k → Approved" |
+| **Adverse Action Codes** | Regulatory-compliant denial reasons |
+| **Bias Dashboard** | Disparate impact by gender, age, region |
+| **Model Cards** | Standardized documentation (Google format) |
 
 ## Quick Start
 
 ```bash
-# Train models
-python -m src.models.train
+pip install -r requirements.txt  # shap, lime, alibi, fairlearn, xgboost
 
-# Start API server
-uvicorn src.api.main:app --reload
+# Explain a single prediction
+python explain.py --model model.xgb --applicant applicant.json
 
-# Run tests
-pytest tests/ -v
+# Batch explain portfolio
+python batch_explain.py --model model.xgb --data portfolio.csv --output explanations/
+
+# Bias audit
+python bias_audit.py --model model.xgb --data portfolio.csv --sensitive gender,age
 ```
 
-## Project Structure
+## API
 
+```python
+from xai_loan import LoanExplainer
+
+explainer = LoanExplainer(model_path="model.xgb")
+
+# Single applicant
+result = explainer.explain(applicant_data)
+print(result.shap_waterfall)
+print(result.counterfactuals)
+print(result.adverse_action_codes)
+
+# Portfolio bias report
+bias_report = explainer.audit_bias(portfolio_df, sensitive_attrs=["gender", "age"])
+bias_report.save_html("bias_report.html")
 ```
-xai_loan_system/
-├── data/                   # Data storage
-├── src/                    # Source code
-│   ├── data/              # Data processing
-│   ├── models/            # ML models
-│   ├── explainability/    # SHAP engine
-│   ├── counterfactual/    # CF generators
-│   ├── ethics/            # Constraints & fairness
-│   └── api/               # FastAPI backend
-├── notebooks/             # Jupyter notebooks
-├── tests/                 # Test suite
-└── docs/                  # Documentation
-```
 
-## API Endpoints
+## Compliance
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/predict` | POST | Loan approval & interest rate prediction |
-| `/explain` | POST | SHAP-based explanations |
-| `/counterfactual` | POST | Generate actionable counterfactuals |
-| `/health` | GET | Service health check |
+- **RBI Circular** — Digital lending transparency
+- **ECOA/Reg B** — Adverse action notice requirements
+- **GDPR Art. 22** — Right to explanation
+- **SR 11-7** — Model risk management
 
-## License
+## Model Support
 
-MIT License
-#
+| Framework | SHAP Explainer | Notes |
+|-----------|----------------|-------|
+| XGBoost/LightGBM | TreeSHAP | Fast, exact |
+| CatBoost | TreeSHAP | Handles categorical |
+| Sklearn (RF, GBT) | TreeSHAP | |
+| Neural Net (TF/PyTorch) | DeepSHAP / GradientSHAP | Approximate |
+| Any (black-box) | KernelSHAP | Slow, universal |
